@@ -13,24 +13,25 @@
   (/ (reduce + xs) (count xs)))
 
 (defn map-overall-average [m]
-  (if m
-    (average (map average (vals m)))
-    nil))
+  (average (map average (vals m))))
 
 (defn map-key-average [k m]
   (average (m k)))
 
 (defn map-overall-average-handler [m] 
-  (response {:average (map-overall-average m)} ))
+  (if m
+    (response {:average (map-overall-average (json/read-str m))})
+    (response {:average nil})))
 
 (defn map-key-average-handler [k m] 
-  (response {:average (map-key-average k m)} ))
-
+  (if m
+    (response {:average (map-key-average k (json/read-str m))})
+    (response {:average nil})))
 
 (defroutes app-routes
   (GET "/" [] "Hello World")
-  (GET "/map-average" [m] (map-overall-average-handler (json/read-str m)))
-  (GET "/map-average/:k" [k m]  (map-key-average-handler k (json/read-str m)))
+  (GET "/map-average" [m] (map-overall-average-handler m))
+  (GET "/map-average/:k" [k m]  (map-key-average-handler k m))
   (route/resources "/")
   (route/not-found "Not Found"))
 
